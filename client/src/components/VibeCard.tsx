@@ -37,9 +37,13 @@ export function VibeCard({ vibe, containerRef }: VibeCardProps) {
     "bg-green-200": "bg-green-200 text-green-900 border-green-400 shadow-green-200/50",
     "bg-purple-200": "bg-purple-200 text-purple-900 border-purple-400 shadow-purple-200/50",
     "bg-white": "bg-white text-gray-900 border-gray-200 shadow-gray-200/50",
+    "bg-purple-500": "bg-purple-500 text-white border-purple-600 shadow-purple-500/50",
+    "bg-amber-500": "bg-amber-500 text-white border-amber-600 shadow-amber-500/50",
+    "bg-blue-400": "bg-blue-400 text-white border-blue-500 shadow-blue-400/50",
+    "bg-green-500": "bg-green-500 text-white border-green-600 shadow-green-500/50",
   };
 
-  const baseStyle = colorStyles[vibe.color] || colorStyles["bg-white"];
+  const baseStyle = colorStyles[vibe.color] || "bg-card text-foreground border-border shadow-md";
 
   return (
     <motion.div
