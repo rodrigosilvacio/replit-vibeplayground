@@ -1,38 +1,40 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// modify the interface with any CRUD methods
-// you might need
+import { db } from "./db";
+import {
+  vibes,
+  type CreateVibeRequest,
+  type UpdateVibeRequest,
+  type Vibe
+} from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  getVibes(): Promise<Vibe[]>;
+  createVibe(vibe: CreateVibeRequest): Promise<Vibe>;
+  updateVibe(id: number, updates: UpdateVibeRequest): Promise<Vibe>;
+  deleteVibe(id: number): Promise<void>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
+export class DatabaseStorage implements IStorage {
+  async getVibes(): Promise<Vibe[]> {
+    return await db.select().from(vibes);
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async createVibe(vibe: CreateVibeRequest): Promise<Vibe> {
+    const [newVibe] = await db.insert(vibes).values(vibe).returning();
+    return newVibe;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+  async updateVibe(id: number, updates: UpdateVibeRequest): Promise<Vibe> {
+    const [updated] = await db.update(vibes)
+      .set(updates)
+      .where(eq(vibes.id, id))
+      .returning();
+    return updated;
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async deleteVibe(id: number): Promise<void> {
+    await db.delete(vibes).where(eq(vibes.id, id));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
