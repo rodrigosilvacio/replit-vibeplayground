@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
 import { type Vibe } from "@shared/schema";
 import { useUpdateVibe, useDeleteVibe } from "@/hooks/use-vibes";
-import { X, GripVertical } from "lucide-react";
-import { useState, useRef } from "react";
+import { X, Pencil } from "lucide-react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { EditVibeDialog } from "./EditVibeDialog";
 
 interface VibeCardProps {
   vibe: Vibe;
@@ -14,7 +15,7 @@ export function VibeCard({ vibe, containerRef }: VibeCardProps) {
   const { mutate: updateVibe } = useUpdateVibe();
   const { mutate: deleteVibe } = useDeleteVibe();
   const [isDragging, setIsDragging] = useState(false);
-  const debounceRef = useRef<NodeJS.Timeout>();
+  const [editOpen, setEditOpen] = useState(false);
 
   const handleDragEnd = (_: any, info: any) => {
     setIsDragging(false);
@@ -67,18 +68,26 @@ export function VibeCard({ vibe, containerRef }: VibeCardProps) {
         baseStyle
       )}
     >
-      <div className="flex justify-between items-start opacity-0 group-hover:opacity-100 transition-opacity absolute top-2 right-2 left-2">
-        <div className="p-1 rounded-full hover:bg-black/5">
-            <GripVertical className="w-4 h-4 text-black/20" />
-        </div>
+      <div className="flex justify-end items-center gap-1 absolute top-2 right-2">
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            setEditOpen(true);
+          }}
+          className="p-1.5 rounded-full bg-black/10 hover:bg-black/20 text-black/60 hover:text-black/80 transition-colors"
+          data-testid={`button-edit-vibe-${vibe.id}`}
+        >
+          <Pencil className="w-3.5 h-3.5" />
+        </button>
         <button 
           onClick={(e) => {
             e.stopPropagation();
             deleteVibe(vibe.id);
           }}
-          className="p-1 rounded-full hover:bg-black/10 text-black/40 hover:text-red-500 transition-colors"
+          className="p-1.5 rounded-full bg-black/10 hover:bg-red-500/80 text-black/60 hover:text-white transition-colors"
+          data-testid={`button-delete-vibe-${vibe.id}`}
         >
-          <X className="w-4 h-4" />
+          <X className="w-3.5 h-3.5" />
         </button>
       </div>
 
@@ -89,6 +98,8 @@ export function VibeCard({ vibe, containerRef }: VibeCardProps) {
       
       {/* Decorative tape effect */}
       <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-white/30 backdrop-blur-md rotate-2 border border-white/20 shadow-sm" />
+      
+      <EditVibeDialog vibe={vibe} open={editOpen} onOpenChange={setEditOpen} />
     </motion.div>
   );
 }
