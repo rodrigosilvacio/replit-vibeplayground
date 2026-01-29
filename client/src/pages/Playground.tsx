@@ -65,7 +65,7 @@ export default function Playground() {
       </div>
 
       {/* Floating Action Buttons */}
-      <div className="absolute bottom-8 right-8 z-20 flex gap-3">
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col sm:flex-row gap-3 pb-safe pr-safe">
         {vibes && vibes.length > 0 && <WriteDialog vibes={vibes} />}
         <CreateVibeDialog />
       </div>

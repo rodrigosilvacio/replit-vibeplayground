@@ -67,3 +67,16 @@
   background-image: radial-gradient(hsla(260, 20%, 80%, 0.4) 1px, transparent 1px);
   background-size: 24px 24px;
 }
+
+/* Safe area utilities for iOS/iPad */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pr-safe {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.mb-safe {
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+}
