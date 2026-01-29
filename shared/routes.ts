@@ -15,6 +15,24 @@ export const errorSchemas = {
 };
 
 export const api = {
+  ai: {
+    consolidate: {
+      method: 'POST' as const,
+      path: '/api/ai/consolidate',
+      input: z.object({
+        vibes: z.array(z.object({
+          content: z.string(),
+          emoji: z.string().optional(),
+        })),
+      }),
+      responses: {
+        200: z.object({
+          message: z.string(),
+        }),
+        500: errorSchemas.internal,
+      },
+    },
+  },
   vibes: {
     list: {
       method: 'GET' as const,

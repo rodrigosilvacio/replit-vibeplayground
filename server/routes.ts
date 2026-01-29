@@ -3,6 +3,12 @@ import type { Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+});
 
 export async function registerRoutes(
   httpServer: Server,
@@ -54,6 +60,43 @@ export async function registerRoutes(
     const id = Number(req.params.id);
     await storage.deleteVibe(id);
     res.status(204).send();
+  });
+
+  // AI consolidation endpoint
+  app.post(api.ai.consolidate.path, async (req, res) => {
+    try {
+      const input = api.ai.consolidate.input.parse(req.body);
+      
+      if (input.vibes.length === 0) {
+        return res.json({ message: "Nenhum vibe para consolidar. Adicione alguns vibes primeiro!" });
+      }
+
+      const vibesText = input.vibes
+        .map((v, i) => `${i + 1}. ${v.emoji || ''} "${v.content}"`)
+        .join('\n');
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: "Você é um assistente criativo que consolida mensagens e vibes em uma única mensagem inspiradora e coesa. Responda em português brasileiro. Seja breve mas impactante."
+          },
+          {
+            role: "user",
+            content: `Consolide esses vibes/recados em uma única mensagem que capture a essência de todos:\n\n${vibesText}`
+          }
+        ],
+        max_tokens: 500,
+      });
+
+      const message = response.choices[0]?.message?.content || "Não foi possível gerar uma mensagem.";
+      
+      res.json({ message });
+    } catch (err) {
+      console.error("Error consolidating vibes:", err);
+      res.status(500).json({ message: "Erro ao consolidar os vibes." });
+    }
   });
 
   // Seed data

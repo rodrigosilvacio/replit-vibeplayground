@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { useVibes } from "@/hooks/use-vibes";
 import { VibeCard } from "@/components/VibeCard";
 import { CreateVibeDialog } from "@/components/CreateVibeDialog";
+import { WriteDialog } from "@/components/WriteDialog";
 import { Loader2 } from "lucide-react";
 
 export default function Playground() {
@@ -63,8 +64,9 @@ export default function Playground() {
         )}
       </div>
 
-      {/* Floating Action Button */}
-      <div className="absolute bottom-8 right-8 z-20">
+      {/* Floating Action Buttons */}
+      <div className="absolute bottom-8 right-8 z-20 flex gap-3">
+        {vibes && vibes.length > 0 && <WriteDialog vibes={vibes} />}
         <CreateVibeDialog />
       </div>
       
